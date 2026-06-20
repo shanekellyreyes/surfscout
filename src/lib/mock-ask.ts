@@ -53,17 +53,20 @@ export function buildMockAskResponse(_message: string): SurfScoutChatResponse {
       {
         level: "green",
         label: "Lower-risk advisory area",
-        description: "Generally milder surf and easier access for the Santa Cruz area",
+        description:
+          "Generally milder surf and easier access for the Santa Cruz area",
       },
       {
         level: "yellow",
         label: "Caution advisory area",
-        description: "Variable surf, crowds, or rocky entry — stay alert and stay shallow",
+        description:
+          "Variable surf, crowds, or rocky entry — stay alert and stay shallow",
       },
       {
         level: "red",
         label: "Avoid / high-risk advisory area",
-        description: "Remote access, stronger surf, or limited exit options for this trip profile",
+        description:
+          "Remote access, stronger surf, or limited exit options for this trip profile",
       },
     ],
     mapMarkers: [
