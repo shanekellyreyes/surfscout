@@ -1,16 +1,33 @@
 import { OCEAN_CAUTION } from "@/data/seed";
+import {
+  DEMO_SANTA_CRUZ_ADVISORY_LEGEND,
+  DEMO_SANTA_CRUZ_MAP_VIEW,
+  getBeachProfiles,
+  requireBeachProfile,
+} from "@/data/beaches";
+import {
+  buildMapMarkers,
+  profileToSaferAlternative,
+  profileToSelectedBeach,
+} from "@/lib/beach-response";
 import type { SurfScoutChatResponse } from "@/types/surfscout";
 
+const DEMO_SELECTED_BEACH_ID = "panther";
+const DEMO_ALTERNATIVE_IDS = ["main-beach", "natural-bridges", "seabright"];
+const DEMO_MAP_BEACH_IDS = [
+  "main-beach",
+  "natural-bridges",
+  "seabright",
+  "panther",
+];
+
 export function buildMockAskResponse(_message: string): SurfScoutChatResponse {
+  const selectedProfile = requireBeachProfile(DEMO_SELECTED_BEACH_ID);
+  const alternativeProfiles = getBeachProfiles(DEMO_ALTERNATIVE_IDS);
+  const mapProfiles = getBeachProfiles(DEMO_MAP_BEACH_IDS);
+
   return {
-    selectedBeach: {
-      id: "panther",
-      name: "Panther Beach",
-      location: "Davenport, CA — north of Santa Cruz",
-      advisory: "red",
-      summary:
-        "Remote cove with steep cliff access and limited exit options. Surf can pick up quickly; not ideal when swimming confidence is limited.",
-    },
+    selectedBeach: profileToSelectedBeach(selectedProfile),
     recommendation: "avoid_for_now",
     headline: "I would not make Panther Beach my first choice for this trip.",
     reasons: [
@@ -19,91 +36,15 @@ export function buildMockAskResponse(_message: string): SurfScoutChatResponse {
       "user wants a quiet/remote beach near Santa Cruz",
       "remote or tide-sensitive beaches can become risky quickly",
     ],
-    saferAlternatives: [
-      {
-        id: "main-beach",
-        name: "Santa Cruz Main Beach",
-        location: "Downtown Santa Cruz",
-        advisory: "yellow",
-        summary:
-          "Lifeguard coverage in season and easy access, but can be crowded and surf varies near the wharf.",
-      },
-      {
-        id: "natural-bridges",
-        name: "Natural Bridges State Beach",
-        location: "Westside Santa Cruz",
-        advisory: "yellow",
-        summary:
-          "Scenic and calmer for tide-pooling; rocky entry makes it better for exploring than swimming.",
-      },
-      {
-        id: "seabright",
-        name: "Seabright State Beach",
-        location: "Eastside Santa Cruz",
-        advisory: "green",
-        summary:
-          "Harbor shadow often keeps surf milder — a better fit for a quieter evening with limited swimming confidence.",
-      },
-    ],
-    mapView: {
-      center: { lat: 37.01, lng: -122.21 },
-      zoom: 11,
-    },
-    advisoryZones: [
-      {
-        level: "green",
-        label: "Lower-risk advisory area",
-        description:
-          "Generally milder surf and easier access for the Santa Cruz area",
-      },
-      {
-        level: "yellow",
-        label: "Caution advisory area",
-        description:
-          "Variable surf, crowds, or rocky entry — stay alert and stay shallow",
-      },
-      {
-        level: "red",
-        label: "Avoid / high-risk advisory area",
-        description:
-          "Remote access, stronger surf, or limited exit options for this trip profile",
-      },
-    ],
-    mapMarkers: [
-      {
-        id: "main-beach",
-        name: "Main Beach",
-        advisory: "yellow",
-        top: "52%",
-        left: "48%",
-      },
-      {
-        id: "natural-bridges",
-        name: "Natural Bridges",
-        advisory: "yellow",
-        top: "45%",
-        left: "28%",
-      },
-      {
-        id: "seabright",
-        name: "Seabright",
-        advisory: "green",
-        top: "58%",
-        left: "62%",
-      },
-      {
-        id: "panther",
-        name: "Panther Beach",
-        advisory: "red",
-        top: "38%",
-        left: "78%",
-      },
-    ],
+    saferAlternatives: alternativeProfiles.map(profileToSaferAlternative),
+    mapView: DEMO_SANTA_CRUZ_MAP_VIEW,
+    advisoryZones: DEMO_SANTA_CRUZ_ADVISORY_LEGEND,
+    mapMarkers: buildMapMarkers(mapProfiles),
     sourcesUsed: [
       {
         id: "s1",
         label: "Seeded SurfScout beach profile",
-        detail: "Demo beach characteristics for Santa Cruz coast",
+        detail: `Demo profile data for ${selectedProfile.name} and nearby alternatives`,
         freshness: "Seeded",
       },
       {

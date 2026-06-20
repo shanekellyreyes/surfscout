@@ -1,4 +1,4 @@
-import type { AdvisoryLevel } from "@/data/seed";
+import type { AdvisoryLevel } from "@/types/surfscout";
 
 export function advisoryStyles(level: AdvisoryLevel) {
   switch (level) {
