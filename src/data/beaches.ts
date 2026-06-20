@@ -1,8 +1,20 @@
 import type { AdvisoryZone } from "@/types/surfscout";
 import type { BeachProfile } from "@/types/beach-profile";
+import type { SurfScoutRegion } from "@/types/risk";
 import { APPROXIMATE_ZONE_DISCLAIMER, BEACH_PROFILES } from "@/data/beach-profiles";
 
 const profileById = new Map(BEACH_PROFILES.map((profile) => [profile.id, profile]));
+
+export const BEACH_REGION_BY_ID: Record<string, SurfScoutRegion> = {
+  panther: "santa-cruz",
+  "natural-bridges": "santa-cruz",
+  "main-beach": "santa-cruz",
+  seabright: "santa-cruz",
+  "ocean-beach-sf": "san-francisco",
+  "baker-beach": "san-francisco",
+  "linda-mar": "pacifica",
+  "half-moon-bay": "half-moon-bay",
+};
 
 export const SANTA_CRUZ_DEMO_BEACH_IDS = [
   "panther",
@@ -67,4 +79,53 @@ export function requireBeachProfile(id: string): BeachProfile {
     throw new Error(`Unknown beach profile: ${id}`);
   }
   return profile;
+}
+
+export function getBeachesForRegion(region: SurfScoutRegion): BeachProfile[] {
+  return BEACH_PROFILES.filter(
+    (profile) => BEACH_REGION_BY_ID[profile.id] === region,
+  );
+}
+
+export function getRegionMapConfig(region: SurfScoutRegion): {
+  mapView: { center: { lat: number; lng: number }; zoom: number };
+  bounds: { north: number; south: number; west: number; east: number };
+  legend: AdvisoryZone[];
+} {
+  if (region === "santa-cruz") {
+    return {
+      mapView: DEMO_SANTA_CRUZ_MAP_VIEW,
+      bounds: SANTA_CRUZ_MAP_BOUNDS,
+      legend: DEMO_SANTA_CRUZ_ADVISORY_LEGEND,
+    };
+  }
+
+  const profiles = getBeachesForRegion(region);
+  const bounds = boundsFromProfiles(profiles);
+
+  return {
+    mapView: {
+      center: {
+        lat: (bounds.north + bounds.south) / 2,
+        lng: (bounds.west + bounds.east) / 2,
+      },
+      zoom: region === "san-francisco" ? 11 : 12,
+    },
+    bounds,
+    legend: DEMO_SANTA_CRUZ_ADVISORY_LEGEND,
+  };
+}
+
+function boundsFromProfiles(profiles: BeachProfile[]) {
+  const latitudes = profiles.map((profile) => profile.latitude);
+  const longitudes = profiles.map((profile) => profile.longitude);
+  const latPad = 0.04;
+  const lngPad = 0.06;
+
+  return {
+    north: Math.max(...latitudes) + latPad,
+    south: Math.min(...latitudes) - latPad,
+    west: Math.min(...longitudes) - lngPad,
+    east: Math.max(...longitudes) + lngPad,
+  };
 }

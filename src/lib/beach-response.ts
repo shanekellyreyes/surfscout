@@ -4,6 +4,7 @@ import type {
   MapMarker,
   SaferAlternative,
   SelectedBeach,
+  AdvisoryLevel,
 } from "@/types/surfscout";
 
 type MapBounds = {
@@ -13,22 +14,28 @@ type MapBounds = {
   east: number;
 };
 
-export function profileToSelectedBeach(profile: BeachProfile): SelectedBeach {
+export function profileToSelectedBeach(
+  profile: BeachProfile,
+  advisory: AdvisoryLevel = profile.defaultAdvisory,
+): SelectedBeach {
   return {
     id: profile.id,
     name: profile.name,
     location: profile.region,
-    advisory: profile.defaultAdvisory,
+    advisory,
     summary: profile.shortDescription,
   };
 }
 
-export function profileToSaferAlternative(profile: BeachProfile): SaferAlternative {
+export function profileToSaferAlternative(
+  profile: BeachProfile,
+  advisory: AdvisoryLevel = profile.defaultAdvisory,
+): SaferAlternative {
   return {
     id: profile.id,
     name: profile.name,
     location: profile.region,
-    advisory: profile.defaultAdvisory,
+    advisory,
     summary: profile.shortDescription,
   };
 }
@@ -49,9 +56,12 @@ export function latLngToMapPosition(
   };
 }
 
-export function buildMapMarkers(profiles: BeachProfile[]): MapMarker[] {
+export function buildMapMarkers(
+  profiles: BeachProfile[],
+  bounds: MapBounds = SANTA_CRUZ_MAP_BOUNDS,
+): MapMarker[] {
   return profiles.map((profile) => {
-    const position = latLngToMapPosition(profile.latitude, profile.longitude);
+    const position = latLngToMapPosition(profile.latitude, profile.longitude, bounds);
     return {
       id: profile.id,
       name: mapMarkerLabel(profile),
