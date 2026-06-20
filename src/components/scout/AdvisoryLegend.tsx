@@ -1,14 +1,18 @@
-import { ADVISORY_ZONES } from "@/data/seed";
+import type { AdvisoryZone } from "@/types/surfscout";
 import { advisoryStyles } from "@/lib/advisory";
 
-export function AdvisoryLegend() {
+type AdvisoryLegendProps = {
+  zones: AdvisoryZone[];
+};
+
+export function AdvisoryLegend({ zones }: AdvisoryLegendProps) {
   return (
     <div className="rounded-xl border border-sky-900/8 bg-white/80 p-4 backdrop-blur-sm">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/60">
         Advisory legend
       </h3>
       <ul className="mt-3 space-y-2">
-        {ADVISORY_ZONES.map((zone) => {
+        {zones.map((zone) => {
           const styles = advisoryStyles(zone.level);
           return (
             <li key={zone.level} className="flex items-start gap-2.5">
@@ -24,6 +28,19 @@ export function AdvisoryLegend() {
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+export function AdvisoryLegendEmpty() {
+  return (
+    <div className="rounded-xl border border-dashed border-sky-300/60 bg-sky-50/30 p-4">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/40">
+        Advisory legend
+      </h3>
+      <p className="mt-2 text-xs text-sky-800/50">
+        Green, yellow, and red zones appear after you ask SurfScout.
+      </p>
     </div>
   );
 }

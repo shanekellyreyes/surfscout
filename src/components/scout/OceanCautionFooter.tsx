@@ -1,6 +1,10 @@
 import { OCEAN_CAUTION } from "@/data/seed";
 
-export function OceanCautionFooter() {
+type OceanCautionFooterProps = {
+  message?: string;
+};
+
+export function OceanCautionFooter({ message = OCEAN_CAUTION }: OceanCautionFooterProps) {
   return (
     <footer className="shrink-0 border-t border-sky-900/10 bg-sky-950 px-4 py-3 text-sky-100">
       <div className="mx-auto flex max-w-[1600px] items-start gap-3">
@@ -10,9 +14,7 @@ export function OceanCautionFooter() {
         >
           ⚠
         </span>
-        <p className="text-xs leading-relaxed text-sky-200/90 sm:text-sm">
-          {OCEAN_CAUTION}
-        </p>
+        <p className="text-xs leading-relaxed text-sky-200/90 sm:text-sm">{message}</p>
       </div>
     </footer>
   );
