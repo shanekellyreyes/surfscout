@@ -1,16 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { EXAMPLE_PROMPT, type ChatMessage } from "@/data/seed";
+import type { ChatMessage } from "@/data/seed";
+import { SCOUT_PROMPT_CHIPS } from "@/data/prompt-chips";
+import type { SurfScoutChatResponse } from "@/types/surfscout";
+import { AssistantResponse } from "./AssistantResponse";
 
 type ChatPanelProps = {
   messages: ChatMessage[];
   loading: boolean;
+  scoutData: SurfScoutChatResponse | null;
+  initialInput?: string;
   onSubmit: (message: string) => void;
 };
 
-export function ChatPanel({ messages, loading, onSubmit }: ChatPanelProps) {
-  const [input, setInput] = useState("");
+export function ChatPanel({
+  messages,
+  loading,
+  scoutData,
+  initialInput = "",
+  onSubmit,
+}: ChatPanelProps) {
+  const [input, setInput] = useState(initialInput);
 
   function handleSubmit(message: string) {
     const trimmed = message.trim();
@@ -19,68 +30,69 @@ export function ChatPanel({ messages, loading, onSubmit }: ChatPanelProps) {
     setInput("");
   }
 
+  const userMessages = messages.filter((m) => m.role === "user");
+
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-b border-sky-900/8 px-4 py-3">
-        <h2 className="text-sm font-semibold text-sky-950">SurfScout chat</h2>
-        <p className="text-xs text-sky-800/60">
-          Ask about Bay Area beaches — conditions, access, and safer options
+    <div className="flex h-full min-h-[420px] flex-col bg-[#fdfbf7] lg:min-h-0">
+      <div className="border-b border-stone-200/70 px-4 py-4">
+        <h2 className="text-sm font-semibold text-[#1e4d5c]">SurfScout assistant</h2>
+        <p className="mt-1 text-xs leading-relaxed text-[#1e3a4a]/65">
+          Ask SurfScout about Bay Area beaches — conditions, access, and safer
+          options.
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SCOUT_PROMPT_CHIPS.slice(0, 4).map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              disabled={loading}
+              onClick={() => handleSubmit(chip)}
+              className="rounded-full border border-[#5a9a9e]/25 bg-white px-2.5 py-1 text-[11px] leading-snug text-[#1e4d5c] transition-colors hover:border-[#2a6f7f]/35 hover:bg-[#e8f4f6] disabled:opacity-50"
+            >
+              {chip.length > 48 ? `${chip.slice(0, 48)}…` : chip}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
-        {messages.length === 0 && (
-          <div className="rounded-xl border border-dashed border-sky-300/60 bg-sky-50/50 p-4 text-center">
-            <p className="text-sm text-sky-800/70">
-              Try the example prompt below to preview the demo flow.
+        {userMessages.length === 0 && !loading && (
+          <div className="rounded-xl bg-[#e8f4f6]/50 px-4 py-3 text-center">
+            <p className="text-sm text-[#1e3a4a]/65">
+              Pick a prompt above or ask your own question below.
             </p>
           </div>
         )}
 
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[92%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                message.role === "user"
-                  ? "rounded-br-md bg-sky-900 text-white"
-                  : "rounded-bl-md border border-sky-900/8 bg-white text-sky-950 shadow-sm"
-              }`}
-            >
-              {message.role === "assistant" && (
-                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-teal-600">
-                  SurfScout
-                </p>
-              )}
-              <span className="whitespace-pre-line">{message.content}</span>
+        {userMessages.map((message) => (
+          <div key={message.id} className="flex justify-end">
+            <div className="max-w-[92%] rounded-2xl rounded-br-md bg-[#2a6f7f] px-4 py-3 text-sm leading-relaxed text-white shadow-sm">
+              {message.content}
             </div>
           </div>
         ))}
 
+        {scoutData && !loading && (
+          <div className="flex justify-start">
+            <div className="max-w-[95%] rounded-2xl rounded-bl-md border border-stone-200/70 bg-white px-4 py-3 shadow-sm">
+              <AssistantResponse response={scoutData} />
+            </div>
+          </div>
+        )}
+
         {loading && (
           <div className="flex justify-start">
-            <div className="rounded-2xl rounded-bl-md border border-sky-900/8 bg-white px-4 py-3 text-sm text-sky-800/60 shadow-sm">
-              SurfScout is thinking…
+            <div className="rounded-2xl rounded-bl-md border border-stone-200/70 bg-white px-4 py-3 text-sm text-[#1e3a4a]/55 shadow-sm">
+              <span className="inline-flex items-center gap-2">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-[#5a9a9e]" />
+                SurfScout is thinking…
+              </span>
             </div>
           </div>
         )}
       </div>
 
-      <div className="space-y-3 border-t border-sky-900/8 p-4">
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => handleSubmit(EXAMPLE_PROMPT)}
-          className="w-full rounded-xl border border-teal-200/80 bg-teal-50/80 px-3 py-2.5 text-left text-xs leading-relaxed text-teal-900 transition-colors hover:border-teal-300 hover:bg-teal-50 disabled:opacity-50"
-        >
-          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-teal-600">
-            Example prompt
-          </span>
-          &ldquo;{EXAMPLE_PROMPT}&rdquo;
-        </button>
-
+      <div className="border-t border-stone-200/70 bg-[#f7f3eb]/50 p-4">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -92,14 +104,14 @@ export function ChatPanel({ messages, loading, onSubmit }: ChatPanelProps) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about a beach..."
+            placeholder="Ask about a beach trip…"
             disabled={loading}
-            className="flex-1 rounded-xl border border-sky-900/10 bg-white px-3 py-2.5 text-sm text-sky-950 placeholder:text-sky-800/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 disabled:opacity-50"
+            className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-3 text-sm text-[#1e3a4a] placeholder:text-[#1e3a4a]/40 focus:border-[#2a6f7f]/45 focus:outline-none focus:ring-2 focus:ring-[#2a6f7f]/12 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="rounded-xl bg-sky-900 px-4 py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-50"
+            className="rounded-xl bg-[#2a6f7f] px-4 py-3 text-sm font-medium text-white shadow-sm transition-opacity hover:bg-[#1e4d5c] disabled:opacity-40"
           >
             Send
           </button>

@@ -7,22 +7,23 @@ type SaferAlternativesProps = {
 
 export function SaferAlternatives({ alternatives }: SaferAlternativesProps) {
   return (
-    <div className="rounded-xl border border-sky-900/8 bg-white/80 p-4 backdrop-blur-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/60">
-        Safer alternatives
-      </h3>
-      <ul className="mt-3 space-y-3">
+    <div className="card-coastal p-5">
+      <p className="section-label">Safer alternatives</p>
+      <p className="mt-1 text-sm text-[#1e3a4a]/65">
+        Nearby options that may better fit your situation right now.
+      </p>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {alternatives.map((beach) => {
           const styles = advisoryStyles(beach.advisory);
           return (
             <li
               key={beach.id}
-              className="rounded-lg border border-sky-900/6 bg-sky-50/50 p-3 transition-colors hover:bg-sky-50"
+              className="rounded-xl border border-stone-200/60 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium text-sky-950">{beach.name}</p>
-                  <p className="text-xs text-sky-800/60">{beach.location}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-[#1e4d5c]">{beach.name}</p>
+                  <p className="text-xs text-[#1e3a4a]/55">{beach.location}</p>
                 </div>
                 <span
                   className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${styles.badge}`}
@@ -31,26 +32,13 @@ export function SaferAlternatives({ alternatives }: SaferAlternativesProps) {
                   {advisoryLabel(beach.advisory)}
                 </span>
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-sky-900/75">
+              <p className="mt-2 text-xs leading-relaxed text-[#1e3a4a]/75">
                 {beach.summary}
               </p>
             </li>
           );
         })}
       </ul>
-    </div>
-  );
-}
-
-export function SaferAlternativesEmpty() {
-  return (
-    <div className="rounded-xl border border-dashed border-sky-300/60 bg-sky-50/30 p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/40">
-        Safer alternatives
-      </h3>
-      <p className="mt-2 text-xs text-sky-800/50">
-        Nearby options will appear after SurfScout responds.
-      </p>
     </div>
   );
 }

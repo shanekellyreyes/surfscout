@@ -7,11 +7,9 @@ type AdvisoryLegendProps = {
 
 export function AdvisoryLegend({ zones }: AdvisoryLegendProps) {
   return (
-    <div className="rounded-xl border border-sky-900/8 bg-white/80 p-4 backdrop-blur-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/60">
-        Advisory legend
-      </h3>
-      <ul className="mt-3 space-y-2">
+    <div className="card-coastal p-5">
+      <p className="section-label">Advisory legend</p>
+      <ul className="mt-3 space-y-3">
         {zones.map((zone) => {
           const styles = advisoryStyles(zone.level);
           return (
@@ -21,26 +19,15 @@ export function AdvisoryLegend({ zones }: AdvisoryLegendProps) {
                 aria-hidden
               />
               <div>
-                <p className="text-sm font-medium text-sky-950">{zone.label}</p>
-                <p className="text-xs text-sky-800/70">{zone.description}</p>
+                <p className="text-sm font-medium text-[#1e4d5c]">{zone.label}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-[#1e3a4a]/65">
+                  {zone.description}
+                </p>
               </div>
             </li>
           );
         })}
       </ul>
-    </div>
-  );
-}
-
-export function AdvisoryLegendEmpty() {
-  return (
-    <div className="rounded-xl border border-dashed border-sky-300/60 bg-sky-50/30 p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-sky-900/40">
-        Advisory legend
-      </h3>
-      <p className="mt-2 text-xs text-sky-800/50">
-        Green, yellow, and red zones appear after you ask SurfScout.
-      </p>
     </div>
   );
 }
