@@ -26,20 +26,22 @@ Use Browserbase as a Live Advisory Research Agent for Bay Area beach safety.
 
 ## Trusted source categories (safety-critical)
 
-SurfScout should prefer official and public sources for safety-critical claims:
+SurfScout should prefer **official and public sources** for safety-critical claims:
 
 - NOAA / National Weather Service (NWS)
 - NDBC / CDIP buoy and coastal observation data
 - California State Parks
 - National Park Service (NPS)
-- City/county beach pages
+- City / county beach pages
 - Lifeguard / public safety pages
 - Harbor / marine condition pages
 - Official park / access pages
 
+See [`docs/source-research.md`](source-research.md) for the full source inventory and station reference.
+
 ## Supplemental surf-condition sources
 
-### Surfline
+### Surfline (supplemental only)
 
 Surfline can provide spot-level surf context such as reported/forecast surf height, wind, and condition ratings for popular breaks like Ocean Beach and Steamer Lane.
 
@@ -64,11 +66,17 @@ Surfline can provide spot-level surf context such as reported/forecast surf heig
 
 ## General rules
 
-- Do not invent official warnings
+- Do not invent official warnings, closures, tide times, or incident counts
 - Do not claim closures unless directly found on an official or authorized public source
 - Prefer official/public sources over news, media, and supplemental surf-condition sites for safety-critical guidance
-- If live browsing fails, return `degradedMode: true`
+- Record confidence and timestamp for every extracted note
+- If live browsing fails or sources are unavailable, return `degradedMode: true`
 
 ## Status
 
-Documentation only — no Browserbase or Surfline integration implemented yet.
+Documentation only — no Browserbase, Surfline, Redis, or Anthropic integration implemented yet.
+
+## Related docs
+
+- [`docs/source-research.md`](source-research.md) — source priority, inventory, and advisory signals
+- [`docs/incident-signal-design.md`](incident-signal-design.md) — historical incident context (background signal only)

@@ -4,20 +4,22 @@
 
 SurfScout uses **historical incident context** as an optional, seeded-data signal for popular Bay Area and Santa Cruz coastlines. It supports cautious guidance — not a “death score” and not a claim that any beach is officially unsafe.
 
-Historical context is **background risk awareness**. It must never replace:
+Historical incident context is **background risk awareness only**. It must not dominate:
 
-- current conditions
-- official alerts
-- posted signs
-- lifeguard guidance
-- the user’s own trip context (swimming ability, timing, companions)
+- **current conditions**
+- **official alerts**
+- **posted signs**
+- **lifeguard guidance**
+- **user context** (swimming ability, timing, companions)
+
+It must never replace Tier 1 sources defined in [`docs/source-research.md`](source-research.md).
 
 ## Responsible use
 
 SurfScout applies these rules to incident history:
 
 1. **No invented counts** — seeded summaries describe hazard patterns, not statistics.
-2. **No live claims** — incident history is not a real-time warning.
+2. **No live claims** — historical incident context is not a real-time warning.
 3. **No sensationalism** — copy stays neutral and educational.
 4. **No official status** — SurfScout does not claim closures, active warnings, or lifeguard orders from incident data alone.
 5. **No safety guarantees** — historical context informs caution; it does not certify safety.
@@ -49,7 +51,7 @@ Seeded demo data uses `confidence: "educational"` and neutral placeholder summar
 
 ## Risk scoring influence
 
-Incident history is a **small background signal** in the deterministic scorer:
+Historical incident context is a **small background signal** in the deterministic scorer — capped so it cannot override current-style signals or user context:
 
 | Severity   | Score bump |
 |------------|------------|
@@ -57,11 +59,12 @@ Incident history is a **small background signal** in the deterministic scorer:
 | `moderate` | +1         |
 | `low`      | +0         |
 
-This is capped by design so incident history cannot dominate:
+Incident history must not dominate:
 
 - seeded hazard profiles
 - access difficulty
 - user context (weak swimmer, evening, quiet/remote preference, family/kids)
+- future live conditions from NOAA / NWS / NDBC / CDIP (when integrated)
 
 When present, the reason generator adds:
 
@@ -75,7 +78,7 @@ When present, the reason generator adds:
 
 When the selected beach has `incidentHistory`:
 
-- a concise historical reason may appear in `reasons`
+- a concise historical context reason may appear in `reasons`
 - a **Historical incident context** entry appears in `sourcesUsed`
 - the scout UI shows a **Historical incident context** card with disclaimer:
 
@@ -115,7 +118,13 @@ Only main demo beaches retain approximate advisory zone polygons. New beaches us
 
 ## Future plan
 
-1. **Browserbase (AdvisoryResearchAgent)** — research trusted public pages (NOAA, State Parks, lifeguard sites, official access pages) and extract advisory-relevant phrases with confidence and timestamps. See `docs/browserbase-plan.md`.
-2. **Redis** — cache source summaries and geospatial safer-beach lookups so incident context and live advisories can be served quickly without re-scraping on every request.
+1. **Browserbase (`AdvisoryResearchAgent`)** — research trusted public pages and extract advisory-relevant phrases with confidence and timestamps. See [`docs/browserbase-plan.md`](browserbase-plan.md) and [`docs/source-research.md`](source-research.md).
+2. **Redis** — cache source summaries and geospatial safer-beach lookups.
+3. **Anthropic** — explain structured signals from provided data only; no invented official claims.
 
-Until then, SurfScout runs in **degraded mode** with seeded incident summaries and deterministic scoring.
+Until live research is integrated, SurfScout runs in **degraded mode** with seeded incident summaries and deterministic scoring.
+
+## Related docs
+
+- [`docs/source-research.md`](source-research.md) — source priority; Historical Incident Context in advisory signals table
+- [`docs/browserbase-plan.md`](browserbase-plan.md) — Browserbase agent plan
