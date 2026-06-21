@@ -10,6 +10,7 @@ import {
   profileToSaferAlternative,
   profileToSelectedBeach,
 } from "@/lib/beach-response";
+import { toHistoricalIncidentContext } from "@/lib/incident-context";
 import {
   buildHeadlineForAssessment,
   riskLevelToAdvisory,
@@ -33,8 +34,33 @@ export function buildMockAskResponse(message: string): SurfScoutChatResponse {
   );
   const regionProfiles = getBeachesForRegion(scored.region);
   const mapConfig = getRegionMapConfig(scored.region);
+  const historicalIncidentContext = toHistoricalIncidentContext(selectedProfile);
 
   const selectedAdvisory = riskLevelToAdvisory(scored.selected.riskLevel);
+
+  const sourcesUsed: SurfScoutChatResponse["sourcesUsed"] = [
+    {
+      id: "s1",
+      label: "Seeded SurfScout beach profile",
+      detail: `Seeded profile and deterministic risk scoring for ${selectedProfile.name}`,
+      freshness: "Seeded",
+    },
+    {
+      id: "s2",
+      label: "Cached advisory notes",
+      detail: "Placeholder cached notes — live research coming soon",
+      freshness: "Cached",
+    },
+  ];
+
+  if (selectedProfile.incidentHistory) {
+    sourcesUsed.push({
+      id: "s3",
+      label: "Historical incident context",
+      detail: selectedProfile.incidentHistory.summary,
+      freshness: "Seeded background",
+    });
+  }
 
   return {
     selectedBeach: profileToSelectedBeach(selectedProfile, selectedAdvisory),
@@ -51,22 +77,10 @@ export function buildMockAskResponse(message: string): SurfScoutChatResponse {
     mapView: mapConfig.mapView,
     advisoryZones: mapConfig.legend,
     mapMarkers: buildMapMarkers(regionProfiles, mapConfig.bounds),
-    sourcesUsed: [
-      {
-        id: "s1",
-        label: "Seeded SurfScout beach profile",
-        detail: `Seeded profile and deterministic risk scoring for ${selectedProfile.name}`,
-        freshness: "Seeded",
-      },
-      {
-        id: "s2",
-        label: "Cached advisory notes",
-        detail: "Placeholder cached notes — live research coming soon",
-        freshness: "Cached",
-      },
-    ],
+    sourcesUsed,
     degradedMode: true,
     oceanCaution: OCEAN_CAUTION,
+    historicalIncidentContext,
   };
 }
 

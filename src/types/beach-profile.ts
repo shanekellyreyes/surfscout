@@ -1,3 +1,4 @@
+import type { IncidentHistory } from "@/types/incident-history";
 import type { AdvisoryLevel } from "@/types/surfscout";
 
 export type BeachAdvisoryZone = {
@@ -22,4 +23,5 @@ export type BeachProfile = {
   defaultAdvisory: AdvisoryLevel;
   advisoryZones?: BeachAdvisoryZone[];
   advisoryZoneDisclaimer?: string;
+  incidentHistory?: IncidentHistory;
 };

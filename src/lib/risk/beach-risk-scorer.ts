@@ -73,6 +73,19 @@ function scoreDevelopedAccess(profile: BeachProfile): number {
   return reduction;
 }
 
+function scoreIncidentHistory(profile: BeachProfile): number {
+  if (!profile.incidentHistory) return 0;
+
+  switch (profile.incidentHistory.severity) {
+    case "high":
+      return 2;
+    case "moderate":
+      return 1;
+    case "low":
+      return 0;
+  }
+}
+
 function scoreUserContext(profile: BeachProfile, context: UserContext): number {
   const text = profileText(profile);
   let score = 0;
@@ -132,7 +145,8 @@ export function scoreBeach(
         scoreHazards(profile) +
         scoreTerrainNotes(profile) +
         scoreAccessDifficulty(profile) +
-        scoreUserContext(profile, context) -
+        scoreUserContext(profile, context) +
+        scoreIncidentHistory(profile) -
         scoreDevelopedAccess(profile),
     ),
   );

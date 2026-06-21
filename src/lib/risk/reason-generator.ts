@@ -1,4 +1,5 @@
 import type { BeachProfile } from "@/types/beach-profile";
+import { HISTORICAL_REASON_TEXT } from "@/data/incident-history-seed";
 import type {
   BeachRiskAssessment,
   ScorerRecommendation,
@@ -114,7 +115,7 @@ export function mergeReasons(...groups: string[][]): string[] {
     }
   }
 
-  return merged.slice(0, 6);
+  return merged.slice(0, 7);
 }
 
 export function attachReasons(
@@ -123,11 +124,21 @@ export function attachReasons(
   context: UserContext,
   region: SurfScoutRegion,
 ): BeachRiskAssessment {
+  const reasons = mergeReasons(
+    generateUserContextReasons(context, region),
+    generateBeachReasons(profile, assessment, context),
+  );
+
+  if (
+    profile.incidentHistory &&
+    !reasons.some((reason) => reason === HISTORICAL_REASON_TEXT)
+  ) {
+    if (reasons.length >= 7) reasons.pop();
+    reasons.push(HISTORICAL_REASON_TEXT);
+  }
+
   return {
     ...assessment,
-    reasons: mergeReasons(
-      generateUserContextReasons(context, region),
-      generateBeachReasons(profile, assessment, context),
-    ),
+    reasons,
   };
 }

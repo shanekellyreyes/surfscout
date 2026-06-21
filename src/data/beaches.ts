@@ -10,10 +10,22 @@ export const BEACH_REGION_BY_ID: Record<string, SurfScoutRegion> = {
   "natural-bridges": "santa-cruz",
   "main-beach": "santa-cruz",
   seabright: "santa-cruz",
+  "twin-lakes": "santa-cruz",
+  capitola: "santa-cruz",
   "ocean-beach-sf": "san-francisco",
   "baker-beach": "san-francisco",
+  stinson: "san-francisco",
+  "muir-beach": "san-francisco",
+  "rodeo-beach": "san-francisco",
+  "china-beach": "san-francisco",
   "linda-mar": "pacifica",
+  rockaway: "pacifica",
+  "sharp-park": "pacifica",
+  montara: "pacifica",
+  "gray-whale-cove": "pacifica",
   "half-moon-bay": "half-moon-bay",
+  mavericks: "half-moon-bay",
+  poplar: "half-moon-bay",
 };
 
 export const SANTA_CRUZ_DEMO_BEACH_IDS = [

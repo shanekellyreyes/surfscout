@@ -1,4 +1,12 @@
 import type { BeachProfile } from "@/types/beach-profile";
+import {
+  BAKER_BEACH_INCIDENT_HISTORY,
+  HALF_MOON_BAY_INCIDENT_HISTORY,
+  LINDA_MAR_INCIDENT_HISTORY,
+  OCEAN_BEACH_SF_INCIDENT_HISTORY,
+  PANTHER_INCIDENT_HISTORY,
+} from "@/data/incident-history-seed";
+import { BEACH_PROFILES_EXTRA } from "@/data/beach-profiles-extra";
 
 export const APPROXIMATE_ZONE_DISCLAIMER =
   "Approximate SurfScout advisory zones for demo purposes — not official safety boundaries.";
@@ -30,6 +38,7 @@ export const BEACH_PROFILES: BeachProfile[] = [
     ],
     defaultAdvisory: "red",
     advisoryZoneDisclaimer: APPROXIMATE_ZONE_DISCLAIMER,
+    incidentHistory: PANTHER_INCIDENT_HISTORY,
     advisoryZones: [
       {
         level: "red",
@@ -213,6 +222,7 @@ export const BEACH_PROFILES: BeachProfile[] = [
       "Stay out of the water when surf is elevated",
     ],
     defaultAdvisory: "yellow",
+    incidentHistory: OCEAN_BEACH_SF_INCIDENT_HISTORY,
   },
   {
     id: "linda-mar",
@@ -241,6 +251,7 @@ export const BEACH_PROFILES: BeachProfile[] = [
       "Do not assume calm conditions because the beach looks sheltered",
     ],
     defaultAdvisory: "yellow",
+    incidentHistory: LINDA_MAR_INCIDENT_HISTORY,
   },
   {
     id: "half-moon-bay",
@@ -269,6 +280,7 @@ export const BEACH_PROFILES: BeachProfile[] = [
       "Check surf forecast before entering the water",
     ],
     defaultAdvisory: "yellow",
+    incidentHistory: HALF_MOON_BAY_INCIDENT_HISTORY,
   },
   {
     id: "baker-beach",
@@ -295,5 +307,7 @@ export const BEACH_PROFILES: BeachProfile[] = [
       "Fog and wind can reduce comfort quickly",
     ],
     defaultAdvisory: "yellow",
+    incidentHistory: BAKER_BEACH_INCIDENT_HISTORY,
   },
+  ...BEACH_PROFILES_EXTRA,
 ];

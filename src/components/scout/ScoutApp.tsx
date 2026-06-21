@@ -15,6 +15,7 @@ import { OceanCautionFooter } from "./OceanCautionFooter";
 import { RiskCard, RiskCardEmpty } from "./RiskCard";
 import { SaferAlternatives, SaferAlternativesEmpty } from "./SaferAlternatives";
 import { SourcesSignals, SourcesSignalsEmpty } from "./SourcesSignals";
+import { HistoricalIncidentCard } from "./HistoricalIncidentCard";
 
 function nextMessageId() {
   return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -136,6 +137,10 @@ export function ScoutApp() {
             />
           ) : (
             <SourcesSignalsEmpty />
+          )}
+
+          {scoutData?.historicalIncidentContext && (
+            <HistoricalIncidentCard context={scoutData.historicalIncidentContext} />
           )}
         </main>
       </div>

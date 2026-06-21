@@ -37,6 +37,8 @@ export type SaferAlternative = {
   summary: string;
 };
 
+import type { HistoricalIncidentContext } from "@/types/incident-history";
+
 export type SourceUsed = {
   id: string;
   label: string;
@@ -56,6 +58,7 @@ export type SurfScoutChatResponse = {
   sourcesUsed: SourceUsed[];
   degradedMode: boolean;
   oceanCaution: string;
+  historicalIncidentContext?: HistoricalIncidentContext;
 };
 
 export type AskRequestBody = {
