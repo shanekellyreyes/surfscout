@@ -6,7 +6,7 @@ const SPONSORS = [
   },
   {
     name: "Redis",
-    status: "Planned Perfect Beach Day + geospatial/cache layer",
+    status: "Perfect Beach Day GEO lookup + cache when REDIS_URL is set",
   },
   {
     name: "Anthropic",

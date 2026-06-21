@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/data/seed";
-import type { SurfScoutChatResponse } from "@/types/surfscout";
+import type { PerfectBeachDayResponse } from "@/types/perfect-beach-day";
 import type { ResearchResponse } from "@/types/research";
+import type { SurfScoutChatResponse } from "@/types/surfscout";
 import { AgentArchitectureCard } from "./AgentArchitectureCard";
 import { AdvisoryLegend } from "./AdvisoryLegend";
 import { ChatPanel } from "./ChatPanel";
@@ -14,6 +15,7 @@ import { LiveAdvisoryScout } from "./LiveAdvisoryScout";
 import { MapPlaceholder } from "./MapPlaceholder";
 import { OceanCautionFooter } from "./OceanCautionFooter";
 import { OnboardingPanel } from "./OnboardingPanel";
+import { PerfectBeachDay } from "./PerfectBeachDay";
 import { RiskCard } from "./RiskCard";
 import { SaferAlternatives } from "./SaferAlternatives";
 import { SourcesSignals } from "./SourcesSignals";
@@ -35,6 +37,12 @@ export function ScoutApp() {
   const [research, setResearch] = useState<ResearchResponse | null>(null);
   const [researchLoading, setResearchLoading] = useState(false);
   const [researchError, setResearchError] = useState<string | null>(null);
+  const [perfectBeachDay, setPerfectBeachDay] =
+    useState<PerfectBeachDayResponse | null>(null);
+  const [perfectBeachDayLoading, setPerfectBeachDayLoading] = useState(false);
+  const [perfectBeachDayError, setPerfectBeachDayError] = useState<string | null>(
+    null,
+  );
   const [initialPrompt] = useState(() => searchParams.get("prompt") ?? "");
 
   const askSurfScout = useCallback(async (message: string) => {
@@ -42,6 +50,8 @@ export function ScoutApp() {
     setError(null);
     setResearch(null);
     setResearchError(null);
+    setPerfectBeachDay(null);
+    setPerfectBeachDayError(null);
     setMessages((prev) => [
       ...prev,
       { id: nextMessageId(), role: "user", content: message },
@@ -98,6 +108,51 @@ export function ScoutApp() {
       setResearchLoading(false);
     }
   }, [scoutData]);
+
+  const findPerfectBeachDay = useCallback(async () => {
+    if (!scoutData) return;
+
+    const prompt =
+      [...messages].reverse().find((message) => message.role === "user")?.content ??
+      initialPrompt;
+
+    if (!prompt.trim()) {
+      setPerfectBeachDayError(
+        "No trip prompt available. Ask SurfScout a question first.",
+      );
+      return;
+    }
+
+    setPerfectBeachDayLoading(true);
+    setPerfectBeachDayError(null);
+
+    try {
+      const res = await fetch("/api/perfect-beach-day", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          beachId: scoutData.selectedBeach.id,
+          prompt: prompt.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `Perfect Beach Day failed (${res.status})`);
+      }
+
+      const data = (await res.json()) as PerfectBeachDayResponse;
+      setPerfectBeachDay(data);
+    } catch (err) {
+      const messageText =
+        err instanceof Error
+          ? err.message
+          : "Could not find Perfect Beach Day candidates.";
+      setPerfectBeachDayError(messageText);
+    } finally {
+      setPerfectBeachDayLoading(false);
+    }
+  }, [scoutData, messages, initialPrompt]);
 
   useEffect(() => {
     const prompt = searchParams.get("prompt");
@@ -179,6 +234,13 @@ export function ScoutApp() {
               </div>
 
               <SaferAlternatives alternatives={scoutData.saferAlternatives} />
+
+              <PerfectBeachDay
+                result={perfectBeachDay}
+                loading={perfectBeachDayLoading}
+                error={perfectBeachDayError}
+                onFind={findPerfectBeachDay}
+              />
 
               <LiveAdvisoryScout
                 research={research}
