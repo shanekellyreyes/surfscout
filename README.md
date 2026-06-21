@@ -59,8 +59,23 @@ npm start       # run production server
 
 Perfect Beach Day uses **Redis GEO** for nearby beach lookup when configured. Redis is optional — the app falls back to seeded in-memory coordinates if Redis is missing or unreachable.
 
+**Preferred (Redis Cloud workshop style):**
+
 ```bash
-export REDIS_URL="redis://localhost:6379"
+export REDIS_HOST="your-redis-host"
+export REDIS_PORT="6379"
+export REDIS_USER="default"
+export REDIS_PASSWORD="your-password"
 ```
+
+Redis Cloud uses a plain TCP connection on the provided host/port (no TLS in the env_parts path).
+
+**Fallback:**
+
+```bash
+export REDIS_URL="redis://default:your-password@your-redis-host:6379"
+```
+
+If both are set, SurfScout prefers `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` (with optional `REDIS_USER`, defaulting to `default`).
 
 Redis Cloud Essentials is recommended for the hackathon (`CALHACKER2026` credit code). See `docs/redis-prize-plan.md` for the full plan.
