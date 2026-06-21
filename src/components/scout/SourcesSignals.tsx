@@ -11,8 +11,8 @@ export function SourcesSignals({ sources, degradedMode }: SourcesSignalsProps) {
       <div className="flex items-center justify-between gap-2">
         <p className="section-label">Sources &amp; signals</p>
         {degradedMode && (
-          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-800 ring-1 ring-amber-200/60">
-            Degraded mode
+          <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-stone-600 ring-1 ring-stone-200/80">
+            Seeded source notes
           </span>
         )}
       </div>

@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SurfScout
 
-## Getting Started
+**Deployed URL:** _TBD — add Vercel/production link before submission_
 
-First, run the development server:
+SurfScout is an AI coastal safety map for Bay Area beachgoers. Ask a natural-language question, see advisory zones for a selected beach, review safer alternatives, and explore seeded source notes — all with clear safety disclaimers.
+
+Built for the UC Berkeley AI Hackathon.
+
+## What it does
+
+- **Landing page** — hero prompt with example beach questions
+- **`/scout`** — chat assistant + advisory map dashboard
+- **Deterministic risk scoring** — seeded beach profiles, user-context parsing, historical incident context
+- **Live Advisory Scout** — `/api/research` scaffold with seeded source notes (Browserbase integration planned)
+- **Safer alternatives** — nearby options ranked for your situation
+
+## Demo prompt
+
+Try this on the landing page or at `/scout`:
+
+> My wife and I want a quiet beach near Santa Cruz this evening. I'm not a strong swimmer. Where should we go?
+
+Expected result: Panther Beach selected with caution guidance and safer alternatives (e.g. Seabright, Main Beach, Natural Bridges).
+
+## Agentic architecture
+
+| Integration | Status |
+| --- | --- |
+| **Browserbase** | Live Advisory Scout source research scaffold; live web integration next |
+| **Redis** | Planned Perfect Beach Day + geospatial/cache layer |
+| **Anthropic** | Planned SafetyAdvisorAgent for grounded advisory summaries |
+| **Simular Sai** | Used for research, docs, QA, and demo testing |
+
+## Safety disclaimer
+
+SurfScout provides **general coastal guidance, not lifeguard advice**. It does **not guarantee beach safety**. Conditions change quickly. Never turn your back on the ocean, check posted signs and lifeguards, and call 911 in an emergency. Advisory overlays and source notes are approximate demo context — not official safety boundaries or live warnings.
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) for the landing page, or [http://localhost:3000/scout](http://localhost:3000/scout) for the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # production build
+npm start       # run production server
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API routes (demo)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `POST /api/ask` — `{ "message": "..." }` → advisory response
+- `POST /api/research` — `{ "beachId": "panther" }` → seeded source notes

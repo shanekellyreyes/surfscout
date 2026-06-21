@@ -24,6 +24,10 @@ export function RiskCard({ beach, recommendation }: RiskCardProps) {
   return (
     <div className="card-coastal p-5">
       <p className="section-label">Selected beach</p>
+      <p className="mt-1 text-xs leading-relaxed text-[#1e3a4a]/60">
+        This is the beach SurfScout evaluated from your prompt — recommended
+        alternatives are shown below.
+      </p>
       <div className="mt-2 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-[#1e4d5c]">{beach.name}</h3>

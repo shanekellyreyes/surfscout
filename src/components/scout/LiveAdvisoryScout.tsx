@@ -7,8 +7,16 @@ type LiveAdvisoryScoutProps = {
   onRefresh: () => void;
 };
 
+const SEEDED_CONTEXT_MESSAGE =
+  "Seeded advisory context — live public-source research is not connected in this demo build.";
+
 function formatLabel(value: string) {
   return value.replace(/_/g, " ");
+}
+
+function formatConfidence(value: string) {
+  if (value === "seeded_fallback") return "Seeded source notes";
+  return formatLabel(value);
 }
 
 function formatFetchedAt(iso: string) {
@@ -34,12 +42,12 @@ export function LiveAdvisoryScout({
         <div>
           <p className="section-label">Live Advisory Scout</p>
           <p className="mt-1 text-xs text-[#1e3a4a]/60">
-            Browserbase-ready scaffold — seeded fallback only in this build.
+            Browserbase-ready scaffold — seeded notes only in this build.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-stone-600 ring-1 ring-stone-200/80">
-            {research ? "Seeded fallback" : "Demo source notes"}
+            Seeded source notes
           </span>
           <button
             type="button"
@@ -47,7 +55,7 @@ export function LiveAdvisoryScout({
             disabled={loading}
             className="rounded-lg bg-[#2a6f7f] px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-opacity hover:bg-[#1e4d5c] disabled:opacity-50"
           >
-            {loading ? "Loading notes…" : "Refresh public advisory notes"}
+            {loading ? "Loading notes…" : "View seeded advisory notes"}
           </button>
         </div>
       </div>
@@ -67,8 +75,8 @@ export function LiveAdvisoryScout({
 
       {research && (
         <div className="mt-4 space-y-4">
-          <div className="rounded-lg border border-amber-200/70 bg-amber-50/80 px-3 py-2.5 text-xs leading-relaxed text-amber-900">
-            {research.degradedReasons[0]}
+          <div className="rounded-lg border border-stone-200/70 bg-[#e8f4f6]/50 px-3 py-2.5 text-xs leading-relaxed text-[#1e3a4a]/75">
+            {SEEDED_CONTEXT_MESSAGE}
           </div>
 
           <ul className="space-y-3">
@@ -83,7 +91,7 @@ export function LiveAdvisoryScout({
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     <span className="rounded-md bg-[#e8f4f6] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#2a6f7f]">
-                      {formatLabel(note.confidence)}
+                      {formatConfidence(note.confidence)}
                     </span>
                     <span className="rounded-md bg-stone-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-stone-600">
                       {formatLabel(note.extractionMethod)}
@@ -91,7 +99,7 @@ export function LiveAdvisoryScout({
                   </div>
                 </div>
                 <p className="mt-1 text-[10px] text-[#1e3a4a]/50">
-                  Fetched {formatFetchedAt(note.fetchedAt)}
+                  Loaded {formatFetchedAt(note.fetchedAt)}
                 </p>
                 <ul className="mt-2 space-y-1">
                   {note.notes.map((item) => (
@@ -116,8 +124,8 @@ export function LiveAdvisoryScout({
 
       {!research && !loading && !error && (
         <p className="mt-4 text-xs leading-relaxed text-[#1e3a4a]/55">
-          Click refresh to load seeded advisory context for the selected beach.
-          Live public-source research is not connected yet.
+          View seeded advisory notes for the selected beach. Live public-source
+          research is not connected yet.
         </p>
       )}
     </div>

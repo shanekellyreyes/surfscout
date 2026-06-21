@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/data/seed";
 import type { SurfScoutChatResponse } from "@/types/surfscout";
 import type { ResearchResponse } from "@/types/research";
+import { AgentArchitectureCard } from "./AgentArchitectureCard";
 import { AdvisoryLegend } from "./AdvisoryLegend";
 import { ChatPanel } from "./ChatPanel";
 import { HistoricalIncidentCard } from "./HistoricalIncidentCard";
@@ -119,7 +120,7 @@ export function ScoutApp() {
             </div>
           </Link>
           <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-amber-800 ring-1 ring-amber-200/60">
-            {scoutData?.degradedMode ? "Demo · Degraded mode" : "Demo · Seeded data"}
+            Demo · Seeded data
           </span>
         </div>
       </header>
@@ -201,6 +202,8 @@ export function ScoutApp() {
           )}
         </main>
       </div>
+
+      <AgentArchitectureCard />
 
       <OceanCautionFooter message={scoutData?.oceanCaution} />
     </div>
