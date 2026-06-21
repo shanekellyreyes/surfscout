@@ -5,9 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/data/seed";
 import type { SurfScoutChatResponse } from "@/types/surfscout";
+import type { ResearchResponse } from "@/types/research";
 import { AdvisoryLegend } from "./AdvisoryLegend";
 import { ChatPanel } from "./ChatPanel";
 import { HistoricalIncidentCard } from "./HistoricalIncidentCard";
+import { LiveAdvisoryScout } from "./LiveAdvisoryScout";
 import { MapPlaceholder } from "./MapPlaceholder";
 import { OceanCautionFooter } from "./OceanCautionFooter";
 import { OnboardingPanel } from "./OnboardingPanel";
@@ -29,11 +31,16 @@ export function ScoutApp() {
   const [scoutData, setScoutData] = useState<SurfScoutChatResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [research, setResearch] = useState<ResearchResponse | null>(null);
+  const [researchLoading, setResearchLoading] = useState(false);
+  const [researchError, setResearchError] = useState<string | null>(null);
   const [initialPrompt] = useState(() => searchParams.get("prompt") ?? "");
 
   const askSurfScout = useCallback(async (message: string) => {
     setLoading(true);
     setError(null);
+    setResearch(null);
+    setResearchError(null);
     setMessages((prev) => [
       ...prev,
       { id: nextMessageId(), role: "user", content: message },
@@ -61,6 +68,35 @@ export function ScoutApp() {
       setLoading(false);
     }
   }, []);
+
+  const refreshResearch = useCallback(async () => {
+    if (!scoutData) return;
+
+    setResearchLoading(true);
+    setResearchError(null);
+
+    try {
+      const res = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ beachId: scoutData.selectedBeach.id }),
+      });
+
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `Research request failed (${res.status})`);
+      }
+
+      const data = (await res.json()) as ResearchResponse;
+      setResearch(data);
+    } catch (err) {
+      const messageText =
+        err instanceof Error ? err.message : "Could not load advisory notes.";
+      setResearchError(messageText);
+    } finally {
+      setResearchLoading(false);
+    }
+  }, [scoutData]);
 
   useEffect(() => {
     const prompt = searchParams.get("prompt");
@@ -142,6 +178,13 @@ export function ScoutApp() {
               </div>
 
               <SaferAlternatives alternatives={scoutData.saferAlternatives} />
+
+              <LiveAdvisoryScout
+                research={research}
+                loading={researchLoading}
+                error={researchError}
+                onRefresh={refreshResearch}
+              />
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <SourcesSignals
