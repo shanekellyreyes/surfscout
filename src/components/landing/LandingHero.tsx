@@ -64,12 +64,12 @@ export function LandingHero() {
           </p>
 
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-[#1e4d5c] sm:text-5xl">
-            Know before you go to the beach.
+            Beautiful beaches. Real risks. Better decisions.
           </h1>
 
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#1e3a4a]/75 sm:text-lg">
-            SurfScout turns coastal hazards, beach access, and safer alternatives
-            into cautious guidance for Bay Area beachgoers.
+            SurfScout helps Bay Area beachgoers understand coastal hazards,
+            access, and safer alternatives.
           </p>
 
           <div className="mt-8 rounded-2xl border border-stone-200/80 bg-[#fdfbf7]/90 p-5 shadow-lg shadow-[#1e4d5c]/5 backdrop-blur-sm sm:p-6">
@@ -155,9 +155,10 @@ export function LandingHero() {
         </div>
       </main>
 
-      <footer className="relative z-10 border-t border-stone-200/60 px-6 py-4 text-center text-xs text-[#1e3a4a]/55">
-        SurfScout provides general guidance, not lifeguard advice. Always check
-        local conditions and posted signage.
+      <footer className="relative z-10 border-t border-stone-200/60 px-6 py-4 text-center text-xs leading-relaxed text-[#1e3a4a]/55">
+        SurfScout is advisory only and does not guarantee beach safety. Always
+        check posted signs, lifeguards on duty, and official sources before you
+        go.
       </footer>
     </div>
   );
