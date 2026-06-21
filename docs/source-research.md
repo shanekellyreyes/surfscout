@@ -6,6 +6,8 @@ SurfScout uses trusted public sources for **advisory decision support** — not 
 
 SurfScout does not guarantee safety. Sources are inputs for cautious, approximate guidance only. Always defer to official warnings, posted signage, and on-site lifeguards. Nothing here should be presented as an official safety boundary or guarantee.
 
+For the product-facing Browserbase runtime flow, see **[Live Advisory Scout — Browserbase Runtime Feature](browserbase-plan.md#live-advisory-scout--browserbase-runtime-feature)** in `docs/browserbase-plan.md`.
+
 ## Source Priority
 
 SurfScout applies a three-tier hierarchy:
@@ -28,7 +30,68 @@ Use for enrichment when Tier 1 data is available — never as the sole basis for
 
 ### Tier 3 — News / media / educational background
 
-Use only when clearly labeled, confidence-scored, and corroborated where possible. Never use alone for closures, active warnings, or lifeguard directives.
+Use only when clearly labeled, confidence-scored, and corroborated where possible. Never use alone for closures, active warnings, or lifeguard directives. See [Future optional community context](#future-optional-community-context).
+
+## Live Advisory Scout — Browserbase Runtime Feature
+
+Product-facing flow (planned — not built yet):
+
+```
+User clicks “Refresh public advisory notes” on /scout
+  → POST /api/research { beachId, beachName, region }
+  → Browserbase Search / Fetch / Browse (AdvisoryResearchAgent)
+  → API discovery per source (api | fetch | browser)
+  → extract advisory / access / surf-condition notes
+  → return ResearchSourceNote[] as source cards + degradedMode
+  → (future) Redis caches notes by beachId
+  → (future) Anthropic explains notes from provided data only
+```
+
+Full specification: [`docs/browserbase-plan.md`](browserbase-plan.md#live-advisory-scout--browserbase-runtime-feature).
+
+### `ResearchSourceNote` (planned)
+
+| Field | Description |
+| --- | --- |
+| `id` | Stable cache key |
+| `sourceName` | Display label |
+| `sourceUrl` | Public canonical URL |
+| `sourceType` | `official_safety` \| `public_safety_page` \| `educational_hazard` \| `supplemental_surf_condition` \| `news_media_historical` |
+| `extractionMethod` | `api` \| `fetch` \| `browser` |
+| `confidence` | Extraction confidence tier |
+| `fetchedAt` | ISO timestamp |
+| `notes` | Extracted bullet points (advisory, access, surf-condition) |
+| `degraded` | Optional per-source partial-failure flag |
+
+## API Discovery
+
+Browserbase **API discovery** is a first-class step before extraction:
+
+| Step | Action |
+| --- | --- |
+| 1 | Start from this document's source inventory |
+| 2 | Detect whether the source exposes a **public API** (e.g. `api.weather.gov`, CO-OPS, NDBC feeds) |
+| 3 | **Prefer API or fetch** for official sources — faster and cache-friendly |
+| 4 | Use **browser extraction** when pages are static HTML without APIs (State Parks, city pages, NPS) |
+| 5 | Record `extractionMethod` on every `ResearchSourceNote` |
+
+**Never:** bypass login/paywalls, scrape private content, or invent warnings, closures, tide times, or incident counts.
+
+Known API-first sources in this inventory:
+
+- NWS — [api.weather.gov/alerts/active](https://api.weather.gov/alerts/active)
+- NOAA CO-OPS — tide prediction and water-level endpoints via [tidesandcurrents.noaa.gov](https://tidesandcurrents.noaa.gov/)
+- NDBC — station data feeds via [ndbc.noaa.gov](https://www.ndbc.noaa.gov/)
+
+## Browserbase Source Types
+
+| Browserbase type | Maps to inventory tier | Use for |
+| --- | --- | --- |
+| `official_safety` | Tier 1 | Safety-critical claims, active alerts (when explicitly present) |
+| `public_safety_page` | Tier 1 | Lifeguard, city/county, access and hazard pages |
+| `educational_hazard` | Tier 3 | Hazard vocabulary, cold-water / sneaker-wave education |
+| `supplemental_surf_condition` | Tier 2 | Surfline spot context — surf height, wind, tide table, ratings |
+| `news_media_historical` | Tier 3 | Historical incident / visitor-experience background only |
 
 ## Source Inventory
 
@@ -172,8 +235,8 @@ Related:
 | --- | --- |
 | **Source type** | `supplemental` |
 | **Homepage** | [surfline.com](https://www.surfline.com/) |
-| **Signal SurfScout could use** | Spot-level reported/forecast surf height, wind, condition ratings (e.g. Ocean Beach, Steamer Lane) |
-| **Browserbase / integration** | Browse **publicly visible** spot pages only; extract surf-condition context with timestamp and low confidence relative to Tier 1 |
+| **Signal SurfScout could use** | Spot-level surf height, wind, tide table (when public), condition ratings (e.g. Ocean Beach, Steamer Lane) |
+| **Browserbase / integration** | Browse **publicly visible** spot pages only; `extractionMethod: browser` or `fetch`; `sourceType: supplemental_surf_condition` |
 | **Reliability caution** | Surf-condition guidance only — **not** beach safety guarantees. Must not be used alone for closures, rescue status, lifeguard directives, or official warnings. |
 
 See [Supplemental Surf-Condition Sources](#supplemental-surf-condition-sources) for full policy.
@@ -209,7 +272,7 @@ Santa Cruz, Pacifica, and Half Moon Bay lack dedicated long-term CO-OPS stations
 
 ### Surfline
 
-Surfline can provide spot-level surf context such as reported/forecast surf height, wind, and condition ratings for popular breaks like **Ocean Beach** and **Steamer Lane**.
+Surfline can provide spot-level surf context such as reported/forecast **surf height**, **wind**, **tide table** (when shown on public pages), and **condition ratings** for popular breaks like **Ocean Beach** and **Steamer Lane**.
 
 - Surfline ratings are **surf-condition guidance**, not beach safety guarantees.
 - Surfline must **not** be used alone for closures, rescue status, lifeguard directives, or official warnings.
@@ -221,14 +284,16 @@ Surfline can provide spot-level surf context such as reported/forecast surf heig
 
 ## Browserbase Research Policy
 
-When Browserbase research is implemented (`AdvisoryResearchAgent` — see `docs/browserbase-plan.md`):
+When Browserbase research is implemented (`AdvisoryResearchAgent` — see [`docs/browserbase-plan.md`](browserbase-plan.md)):
 
-1. Browse **publicly visible pages only** — no login bypass, no paywall circumvention.
-2. Respect site terms, `robots.txt`, and rate limits.
-3. **Prefer official/public safety sources** for safety-critical claims.
-4. Use Surfline **supplementally** for surf height, wind, and condition ratings when publicly accessible.
-5. **Record confidence and timestamp** for every extracted note.
-6. **Never invent** warnings, closures, tide times, or incident counts.
+1. Run **API discovery** before extraction — prefer APIs/fetch for official sources.
+2. Browse **publicly visible pages only** — no login bypass, no paywall circumvention.
+3. Respect site terms, `robots.txt`, and rate limits.
+4. **Prefer official/public safety sources** for safety-critical claims.
+5. Use Surfline **supplementally** (`supplemental_surf_condition`) for surf height, wind, tide table, and condition context when publicly accessible.
+6. **Record confidence, `extractionMethod`, and timestamp** on every `ResearchSourceNote`.
+7. **Never invent** warnings, closures, tide times, or incident counts.
+8. Return source cards suitable for the **“Refresh public advisory notes”** UI action.
 
 ### Fallback and degraded mode
 
@@ -265,14 +330,35 @@ All signals are approximate and strictly advisory — not official safety bounda
 5. **Educational bundling:** Pair localized outputs with cold-water, sneaker-wave, and swim-near-lifeguard reminders where appropriate.
 6. **Core identity:** SurfScout provides decision-support guidance — it does not validate safe/unsafe binaries and never guarantees safety.
 
+## Not in Scope for v1
+
+- Google Earth integration
+- Google Maps API migration
+- Reddit sentiment as **live** safety input
+- Scraping private or paywalled sources
+- Claiming official safety boundaries from research notes or advisory overlays
+
+## Future Optional Community Context
+
+Sai may research **Reddit / community sentiment offline** for visitor-experience themes (crowds, parking, trail access, general beach vibe).
+
+**Boundaries:**
+
+- Reddit is **not** an official safety source
+- Reddit must **not** be a primary risk-scoring input
+- Any community-derived note uses `news_media_historical` (or a future `community_experience` type) — never `official_safety`
+- Community themes may inform copy only when labeled anecdotal or corroborated by Tier 1 sources
+
+See also [`docs/browserbase-plan.md`](browserbase-plan.md#future-optional-community-context).
+
 ## Future Integration
 
 | Component | Role | Status |
 | --- | --- | --- |
-| **Browserbase** (`AdvisoryResearchAgent`) | Browse trusted public pages; extract advisory-relevant phrases with confidence and timestamp | Not built |
-| **Redis** | Cache source summaries and research timestamps | Not built |
+| **Browserbase** (`AdvisoryResearchAgent`) | Live Advisory Scout — `/api/research`, API discovery, `ResearchSourceNote[]` source cards | Not built |
+| **Redis** | Cache `ResearchSourceNote[]` per beachId with TTL | Not built |
 | **Seeded profiles** | Fallback when live research fails | Active (demo) |
-| **Anthropic** | Explain structured signals from provided data only — no invented claims | Not built |
+| **Anthropic** | Explain structured notes from provided data only — no invented claims | Not built |
 | **Surfline** | Supplemental surf-condition context via public pages only | Not built |
 
 ## Related Docs
